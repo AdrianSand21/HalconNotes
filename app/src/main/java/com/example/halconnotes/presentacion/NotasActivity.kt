@@ -1,8 +1,9 @@
-package com.example.halconnotes
+package com.example.halconnotes.presentacion
 
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.halconnotes.R
 
 class NotasActivity : AppCompatActivity() {
 
