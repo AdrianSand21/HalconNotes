@@ -14,11 +14,40 @@
         android:textStyle="bold"
         android:text="Nombre Materia" />
 
+    <LinearLayout
+        android:id="@+id/layoutResumen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvTituloMateria"
+        android:background="#E0E0E0"
+        android:padding="10dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvPesoTotal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Peso: 0%"
+            android:textStyle="bold"
+            android:textColor="#000000"/>
+
+        <TextView
+            android:id="@+id/tvCalificacionTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Promedio: 0.0"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#6200EE"/>
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvNotas"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/tvTituloMateria"/>
+        android:layout_below="@id/layoutResumen"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAgregarNota"
