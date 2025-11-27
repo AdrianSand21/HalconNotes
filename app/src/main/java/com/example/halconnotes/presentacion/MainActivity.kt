@@ -3,6 +3,7 @@ package com.example.halconnotes.presentacion
 import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.viewModels // Necesario para instanciar el ViewModel
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity() {
                 intent.putExtra("NOMBRE_CURSO", curso.nombre)
                 // También deberías pasar el ID para cargar las notas correctas
                 intent.putExtra("ID_CURSO", curso.id_curso)
+                //Toast.makeText(this, "Abriendo ID: ${curso.id_curso}", Toast.LENGTH_SHORT).show()
                 startActivity(intent)
             },
             onCursoLongClick = { posicion ->

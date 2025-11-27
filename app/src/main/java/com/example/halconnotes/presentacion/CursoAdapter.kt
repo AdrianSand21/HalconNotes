@@ -31,7 +31,8 @@ class CursoAdapter(
     override fun onBindViewHolder(holder: CursoViewHolder, position: Int) {
         val curso = listaCursos[position]
         holder.tvNombre.text = curso.nombre
-        holder.tvPromedio.text = curso.promedioActual.toString()
+        val promedioFormateado = String.format("%.2f", curso.promedioActual)
+        holder.tvPromedio.text = promedioFormateado
 
         holder.itemView.setOnClickListener { onCursoClick(position) }
         holder.itemView.setOnLongClickListener {
