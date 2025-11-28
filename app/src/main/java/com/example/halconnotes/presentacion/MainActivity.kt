@@ -13,6 +13,7 @@ import com.example.halconnotes.R
 import com.example.halconnotes.control.CursoViewModel
 import com.example.halconnotes.data.Curso
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import android.widget.Button
 
 class MainActivity : AppCompatActivity() {
 
@@ -56,6 +57,12 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener {
             mostrarDialogoAgregar()
         }
+        val btnPromedio = findViewById<Button>(R.id.btnPromedio)
+        btnPromedio.setOnClickListener {
+            val intent = Intent(this, PromedioActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 
     // --- FUNCIONES DE DIÁLOGOS CONECTADAS A LA BD ---
@@ -126,4 +133,6 @@ class MainActivity : AppCompatActivity() {
             }
             .show()
     }
-}
+
+
+    }

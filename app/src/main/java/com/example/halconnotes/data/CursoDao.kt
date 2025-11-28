@@ -9,6 +9,13 @@ interface CursoDao {
     @Query("SELECT * FROM curso ORDER BY nombre ASC")
     fun obtenerTodosLosCursos(): LiveData<List<Curso>>
 
+    @Query("SELECT * FROM curso WHERE id_alumno = :idAlumno")
+    fun obtenerCursosDeAlumno(idAlumno: Int): LiveData<List<Curso>>
+
+    @Query("SELECT AVG(promedioActual) FROM curso WHERE id_alumno = :idAlumno")
+    fun obtenerPromedioGeneral(idAlumno: Int): LiveData<Double?>
+
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertarCurso(curso: Curso)
 
