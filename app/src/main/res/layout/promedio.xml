@@ -27,7 +27,7 @@
         android:textStyle="bold"
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
-        android:textColor="@android:color/holo_blue_dark"/>
+        android:textColor="#0D47A1"/>
 
     <!-- SUBTÍTULO -->
     <TextView

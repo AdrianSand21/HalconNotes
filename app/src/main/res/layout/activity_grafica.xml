@@ -3,15 +3,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentacion.GraficaActivity"
+    android:background="@color/background"
     android:padding="16dp"
-    android:background="@color/background">
+    tools:context=".presentacion.GraficaActivity">
+
+
+    <TextView
+        android:id="@+id/tvTituloGrafica"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gráfica de calificaciones"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#0D47A1"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"/>
+
+
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/barChart"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerInParent="true" />
-
+        android:layout_below="@id/tvTituloGrafica"
+        android:layout_marginTop="16dp"/>
 </RelativeLayout>
 
