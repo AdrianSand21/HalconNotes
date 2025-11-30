@@ -36,6 +36,21 @@
         android:layout_marginBottom="20dp"
         android:elevation="10dp"/>
 
+    <Button
+        android:id="@+id/btnGrafica"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gráfica"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:backgroundTint="@color/secondary"
+        android:layout_below="@id/btnPromedio"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="20dp"
+        android:elevation="10dp"/>
+
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAgregar"
         android:layout_width="wrap_content"

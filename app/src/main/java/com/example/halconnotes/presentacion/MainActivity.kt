@@ -63,6 +63,13 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        val btnGrafica = findViewById<Button>(R.id.btnGrafica)
+        btnGrafica.setOnClickListener {
+            val intent = Intent(this, GraficaActivity::class.java)
+            startActivity(intent)
+        }
+
+
     }
 
     // --- FUNCIONES DE DIÁLOGOS CONECTADAS A LA BD ---
