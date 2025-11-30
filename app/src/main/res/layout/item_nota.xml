@@ -17,7 +17,8 @@
             android:layout_weight="1"
             android:text="Examen Parcial"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="@android:color/black"/>
 
         <TextView
             android:id="@+id/tvCalificacion"
@@ -26,7 +27,7 @@
             android:text="10.0"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#2196F3"/>
+            android:textColor="#FFC107"/>
     </LinearLayout>
 
     <TextView

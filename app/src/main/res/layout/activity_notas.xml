@@ -49,9 +49,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Promedio: 0.0"
+            android:textColor="#0D47A1"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="#6200EE"/>
+            android:textStyle="bold" />
     </LinearLayout>
 
     <RelativeLayout
@@ -67,10 +67,12 @@
             android:id="@+id/fabAgregarNota"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
             android:layout_margin="16dp"
-            android:src="@android:drawable/ic_input_add" />
+            android:src="@android:drawable/ic_input_add"
+            android:tint="@color/black"
+            app:backgroundTint="#FFC107" />
     </RelativeLayout>
 
 </LinearLayout>
