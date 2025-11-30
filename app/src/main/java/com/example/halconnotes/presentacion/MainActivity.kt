@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onResume() {
         super.onResume()
-        // Forzamos al adaptador a redibujar la lista. 
+        // Forzamos al adaptador a redibujar la lista.
         // Como el adaptador lee la escala en 'onBindViewHolder', esto actualizará el formato (ej. de 100 a 5.0) instantáneamente.
         if (::adapter.isInitialized) {
             adapter.notifyDataSetChanged()
@@ -116,7 +116,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, GradeScaleFragment())
             .commit()
-        
+
         // Cambiar título opcionalmente
         // title = "Configuración"
     }
@@ -132,13 +132,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             rvCursos.visibility = View.VISIBLE
             fab.visibility = View.VISIBLE
             btnPromedio.visibility = View.VISIBLE
-            
+
             // Quitar el fragmento
             val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
             if (fragment != null) {
                 supportFragmentManager.beginTransaction().remove(fragment).commit()
             }
-            
+
             // Refrescar lista también al volver de fragmento
             if (::adapter.isInitialized) {
                 adapter.notifyDataSetChanged()
@@ -146,6 +146,29 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else {
             super.onBackPressed()
         }
+        val btnGrafica = findViewById<Button>(R.id.btnGrafica)
+        btnGrafica.setOnClickListener {
+            // Obtener todos los cursos del adapter
+            val cursos = adapter.obtenerTodosLosCursos()
+
+            // Crear listas separadas para nombres y promedios
+            val nombres = ArrayList<String>()
+            val promedios = FloatArray(cursos.size)
+
+            cursos.forEachIndexed { index, curso ->
+                nombres.add(curso.nombre)
+                promedios[index] = curso.promedioActual
+            }
+
+            // Crear Intent para GraficaActivity
+            val intent = Intent(this, GraficaActivity::class.java)
+            intent.putStringArrayListExtra("NOMBRES", nombres)
+            intent.putExtra("PROMEDIOS", promedios)
+
+            // Iniciar actividad
+            startActivity(intent)
+        }
+
     }
 
     // --- FUNCIONES DE DIÁLOGOS CONECTADAS A LA BD ---

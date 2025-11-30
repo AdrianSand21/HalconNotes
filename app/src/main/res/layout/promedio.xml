@@ -36,6 +36,27 @@
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
             android:textColor="@android:color/holo_blue_dark"/>
+    <!-- TÍTULO -->
+    <TextView
+        android:id="@+id/txtTitulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Promedio Total"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:layout_gravity="center"/>
+
+    <!-- PROMEDIO GENERAL -->
+    <TextView
+        android:id="@+id/txtPromedioGeneral"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0.0"
+        android:textSize="50sp"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:textColor="#0D47A1"/>
 
         <!-- SUBTÍTULO -->
         <TextView

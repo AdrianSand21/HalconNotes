@@ -41,6 +41,15 @@
             android:paddingBottom="150dp"
             android:clipToPadding="false" />
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:gravity="center">
+
         <Button
             android:id="@+id/btnPromedio"
             android:layout_width="wrap_content"
@@ -49,10 +58,23 @@
             android:textStyle="bold"
             android:textColor="@android:color/black"
             android:backgroundTint="@color/secondary"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="20dp"
-            android:elevation="10dp"/>
+            android:elevation="10dp"
+            android:layout_marginBottom="16dp"/>
+
+        <Button
+            android:id="@+id/btnGrafica"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ver gráfica"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:backgroundTint="@color/secondary"
+            android:elevation="10dp"
+            android:layout_marginBottom="16dp"/>
+
+    </LinearLayout>
+
+
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabAgregar"

@@ -67,4 +67,10 @@ class CursoAdapter(
         this.listaCursos = nuevosCursos
         notifyDataSetChanged() // Refresca la vista
     }
+
+    // Devuelve todos los cursos actualmente cargados en el adapter
+    fun obtenerTodosLosCursos(): List<Curso> {
+        return listaCursos
+    }
+
 }

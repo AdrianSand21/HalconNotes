@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.ksp)
+
+
 }
 
 android {
@@ -69,4 +71,8 @@ dependencies {
 
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }
+
+
