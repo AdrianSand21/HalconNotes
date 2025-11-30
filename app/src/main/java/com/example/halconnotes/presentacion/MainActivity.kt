@@ -65,10 +65,26 @@ class MainActivity : AppCompatActivity() {
 
         val btnGrafica = findViewById<Button>(R.id.btnGrafica)
         btnGrafica.setOnClickListener {
+            // Obtener todos los cursos del adapter
+            val cursos = adapter.obtenerTodosLosCursos()
+
+            // Crear listas separadas para nombres y promedios
+            val nombres = ArrayList<String>()
+            val promedios = FloatArray(cursos.size)
+
+            cursos.forEachIndexed { index, curso ->
+                nombres.add(curso.nombre)
+                promedios[index] = curso.promedioActual
+            }
+
+            // Crear Intent para GraficaActivity
             val intent = Intent(this, GraficaActivity::class.java)
+            intent.putStringArrayListExtra("NOMBRES", nombres)
+            intent.putExtra("PROMEDIOS", promedios)
+
+            // Iniciar actividad
             startActivity(intent)
         }
-
 
     }
 
