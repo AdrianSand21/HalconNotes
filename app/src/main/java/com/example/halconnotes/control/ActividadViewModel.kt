@@ -59,11 +59,14 @@ class ActividadViewModel(application: Application) : AndroidViewModel(applicatio
 
         var sumaPuntos = 0f
 
-        for (act in lista) {
-            // Fórmula: (Calificación / 10) * Peso
-            // Ejemplo: (9.0 / 10) * 20 = 1.8 puntos
-            val puntos = (act.calificacion / 10f) * act.peso
-            sumaPuntos += puntos
+        // FÓRMULA CORREGIDA (Base 100 Estándar)
+        // Usamos 100f fijo porque las calificaciones ya están normalizadas (0-100) en la BD.
+        // Esto evita que escalas pequeñas (0-5) generen promedios gigantes.
+        if (100f > 0f) {
+            for (act in lista) {
+                val puntos = (act.calificacion / 100f) * act.peso
+                sumaPuntos += puntos
+            }
         }
 
         // Guardamos el nuevo promedio en la tabla Curso para que se vea en el inicio

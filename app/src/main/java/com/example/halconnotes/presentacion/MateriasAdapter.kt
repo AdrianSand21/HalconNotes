@@ -26,7 +26,20 @@ class MateriasAdapter(
     override fun onBindViewHolder(holder: MateriaViewHolder, position: Int) {
         val curso = lista[position]
         holder.tvNombre.text = curso.nombre
-        holder.tvPromedio.text = String.format("%.2f", curso.promedioActual)
+
+        // 1. Obtener la escala configurada actualmente
+        val context = holder.itemView.context
+        val currentScale = com.example.halconnotes.control.ScaleManager.getCurrentScale(context)
+
+        // 2. Convertir el promedio base (0-100) a la escala visual (0-5, A-F, etc.)
+        // Es CRUCIAL usar esta conversión para que coincida con el resto de la app.
+        val promedioVisual = com.example.halconnotes.control.ScaleManager.convert(
+            curso.promedioActual.toDouble(), 
+            currentScale
+        )
+        
+        // 3. Mostrar el valor ya convertido
+        holder.tvPromedio.text = promedioVisual
     }
 
     override fun getItemCount() = lista.size
@@ -36,4 +49,3 @@ class MateriasAdapter(
         notifyDataSetChanged()
     }
 }
-

@@ -9,10 +9,12 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.halconnotes.R
 import com.example.halconnotes.control.ActividadViewModel
+import com.example.halconnotes.control.ScaleManager
 import com.example.halconnotes.data.Actividad
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -26,7 +28,6 @@ class NotasActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notas)
 
-        // 1. Recibir datos del MainActivity
         val nombreCurso = intent.getStringExtra("NOMBRE_CURSO") ?: "Curso"
         idCursoActual = intent.getIntExtra("ID_CURSO", -1)
 
@@ -35,57 +36,58 @@ class NotasActivity : AppCompatActivity() {
             finish()
             return
         }
+        
+        // CONFIGURACIÓN DEL TOOLBAR Y NAVEGACIÓN
+        val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
+        toolbar.title = nombreCurso // Asigna el nombre de la materia al encabezado
+        toolbar.setNavigationOnClickListener {
+            finish() // Cierra la actividad
+        }
 
-        // 2. Referencias a la UI
-        val tvTitulo = findViewById<TextView>(R.id.tvTituloMateria)
-        val tvPesoTotal = findViewById<TextView>(R.id.tvPesoTotal)          // Barra resumen
-        val tvCalificacionTotal = findViewById<TextView>(R.id.tvCalificacionTotal) // Barra resumen
+        // Eliminamos referencia al antiguo título
+        // val tvTitulo = findViewById<TextView>(R.id.tvTituloMateria)
+        val tvPesoTotal = findViewById<TextView>(R.id.tvPesoTotal)
+        val tvCalificacionTotal = findViewById<TextView>(R.id.tvCalificacionTotal)
         val rvNotas = findViewById<RecyclerView>(R.id.rvNotas)
         val fab = findViewById<FloatingActionButton>(R.id.fabAgregarNota)
 
-        tvTitulo.text = nombreCurso
+        // tvTitulo.text = nombreCurso // Ya lo hace el toolbar
 
-        // 3. Configurar RecyclerView y Adaptador
         rvNotas.layoutManager = LinearLayoutManager(this)
 
         adapter = ActividadAdapter(
             onItemClick = { actividad ->
-                mostrarDialogoEditarActividad(actividad) // Clic corto: Editar
+                mostrarDialogoEditarActividad(actividad)
             },
             onLongClick = { actividad ->
-                mostrarDialogoEliminar(actividad) // Clic largo: Eliminar
+                mostrarDialogoEliminar(actividad)
             }
         )
         rvNotas.adapter = adapter
 
-        // 4. Observar la Base de Datos (Lógica Módulo 2 y 3)
         actividadViewModel.obtenerActividadesDeCurso(idCursoActual).observe(this) { actividades ->
-
-            // Actualizar lista visual
             adapter.actualizarLista(actividades)
 
-            // --- CÁLCULO DEL PROMEDIO (MÓDULO 3) ---
             var sumaPesos = 0f
             var sumaPuntos = 0f
 
             for (act in actividades) {
                 sumaPesos += act.peso
-                // (Nota / 10) * Peso. Ajusta '10f' si tu escala es 100
-                sumaPuntos += (act.calificacion / 10f) * act.peso
+                // Siempre dividir entre 100f porque 'act.calificacion' es base 100
+                val puntosGanados = (act.calificacion / 100f) * act.peso
+                sumaPuntos += puntosGanados
             }
+            
+            val currentScale = ScaleManager.getCurrentScale(this)
+            val promedioVisual = ScaleManager.convert(sumaPuntos.toDouble(), currentScale)
 
-            // Actualizar textos de resumen
-            val promedioFormateado = String.format("%.2f", sumaPuntos)
+            tvPesoTotal.text = getString(R.string.progreso_formato, String.format("%.0f", sumaPesos))
+            tvCalificacionTotal.text = getString(R.string.acumulado_formato, promedioVisual)
 
-            tvPesoTotal.text = "Progreso: $sumaPesos / 100 %"
-            tvCalificacionTotal.text = "Acumulado: $promedioFormateado"
-
-            // Cambio de color al completar
             if (sumaPesos >= 100f) {
-                tvPesoTotal.setTextColor(android.graphics.Color.parseColor("#388E3C")) // Verde
-                tvPesoTotal.text = "¡Materia Completa! (100%)"
-
-                tvCalificacionTotal.text = "FINAL: $promedioFormateado"
+                tvPesoTotal.setTextColor(ContextCompat.getColor(this, R.color.verde_completo))
+                tvPesoTotal.text = getString(R.string.materia_completa)
+                tvCalificacionTotal.text = getString(R.string.final_formato, promedioVisual)
                 tvCalificacionTotal.textSize = 22f
             } else {
                 tvPesoTotal.setTextColor(android.graphics.Color.BLACK)
@@ -93,13 +95,46 @@ class NotasActivity : AppCompatActivity() {
             }
         }
 
-        // 5. Botón Agregar (¡Ahora sí funcionará!)
         fab.setOnClickListener {
             mostrarDialogoAgregarNota()
         }
     }
-
-    // --- FUNCIONES DE DIÁLOGOS ---
+    
+    override fun onResume() {
+        super.onResume()
+        if (idCursoActual != -1) {
+             adapter.notifyDataSetChanged()
+             // También refrescar los cálculos totales
+             actividadViewModel.obtenerActividadesDeCurso(idCursoActual).value?.let { actividades ->
+                 var sumaPesos = 0f
+                 var sumaPuntos = 0f
+                 for (act in actividades) {
+                    sumaPesos += act.peso
+                    // Siempre dividir entre 100f porque 'act.calificacion' es base 100
+                    val puntosGanados = (act.calificacion / 100f) * act.peso
+                    sumaPuntos += puntosGanados
+                 }
+                 val currentScale = ScaleManager.getCurrentScale(this)
+                 val promedioVisual = ScaleManager.convert(sumaPuntos.toDouble(), currentScale)
+                 
+                 val tvPesoTotal = findViewById<TextView>(R.id.tvPesoTotal)
+                 val tvCalificacionTotal = findViewById<TextView>(R.id.tvCalificacionTotal)
+                 
+                 // Re-aplicar lógica de UI
+                 if (sumaPesos >= 100f) {
+                     tvPesoTotal.setTextColor(ContextCompat.getColor(this, R.color.verde_completo))
+                     tvPesoTotal.text = getString(R.string.materia_completa)
+                     tvCalificacionTotal.text = getString(R.string.final_formato, promedioVisual)
+                     tvCalificacionTotal.textSize = 22f
+                 } else {
+                     tvPesoTotal.setTextColor(android.graphics.Color.BLACK)
+                     tvPesoTotal.text = getString(R.string.progreso_formato, String.format("%.0f", sumaPesos))
+                     tvCalificacionTotal.text = getString(R.string.acumulado_formato, promedioVisual)
+                     tvCalificacionTotal.textSize = 18f
+                 }
+             }
+        }
+    }
 
     private fun mostrarDialogoAgregarNota() {
         val layout = LinearLayout(this)
@@ -114,9 +149,12 @@ class NotasActivity : AppCompatActivity() {
         inputPeso.hint = "Peso % (Ej. 30)"
         inputPeso.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         layout.addView(inputPeso)
+        
+        val currentScale = ScaleManager.getCurrentScale(this)
+        val hint = ScaleManager.getHintForScale(currentScale)
 
         val inputNota = EditText(this)
-        inputNota.hint = "Calificación (Ej. 9.5)"
+        inputNota.hint = hint
         inputNota.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         layout.addView(inputNota)
 
@@ -126,19 +164,20 @@ class NotasActivity : AppCompatActivity() {
             .setPositiveButton("Guardar") { _, _ ->
                 val nombre = inputNombre.text.toString()
                 val peso = inputPeso.text.toString().toFloatOrNull()
-                val nota = inputNota.text.toString().toFloatOrNull()
+                val notaStr = inputNota.text.toString()
+                
+                val notaInterna = ScaleManager.parseGradeInput(notaStr, currentScale)
 
-                if (nombre.isNotEmpty() && peso != null && nota != null) {
-                    // Guardar en BD
+                if (nombre.isNotEmpty() && peso != null && notaInterna != null) {
                     val nuevaActividad = Actividad(
-                        id_curso = idCursoActual, // Vinculamos al curso actual
+                        id_curso = idCursoActual,
                         nombre = nombre,
                         peso = peso,
-                        calificacion = nota
+                        calificacion = notaInterna
                     )
                     actividadViewModel.insertarActividad(nuevaActividad)
                 } else {
-                    Toast.makeText(this, "Datos incompletos", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.datos_invalidos), Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancelar", null)
@@ -158,9 +197,13 @@ class NotasActivity : AppCompatActivity() {
         inputPeso.setText(actividad.peso.toString())
         inputPeso.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         layout.addView(inputPeso)
+        
+        val currentScale = ScaleManager.getCurrentScale(this)
+        // Convertir nota interna (0-100) a escala actual para mostrar al usuario
+        val notaUsuario = ScaleManager.convert(actividad.calificacion.toDouble(), currentScale)
 
         val inputNota = EditText(this)
-        inputNota.setText(actividad.calificacion.toString())
+        inputNota.setText(notaUsuario)
         inputNota.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         layout.addView(inputNota)
 
@@ -170,15 +213,19 @@ class NotasActivity : AppCompatActivity() {
             .setPositiveButton("Actualizar") { _, _ ->
                 val nuevoNombre = inputNombre.text.toString()
                 val nuevoPeso = inputPeso.text.toString().toFloatOrNull()
-                val nuevaNota = inputNota.text.toString().toFloatOrNull()
+                val nuevaNotaStr = inputNota.text.toString()
+                
+                val nuevaNotaInterna = ScaleManager.parseGradeInput(nuevaNotaStr, currentScale)
 
-                if (nuevoNombre.isNotEmpty() && nuevoPeso != null && nuevaNota != null) {
+                if (nuevoNombre.isNotEmpty() && nuevoPeso != null && nuevaNotaInterna != null) {
                     val actividadEditada = actividad.copy(
                         nombre = nuevoNombre,
                         peso = nuevoPeso,
-                        calificacion = nuevaNota
+                        calificacion = nuevaNotaInterna
                     )
                     actividadViewModel.actualizarActividad(actividadEditada)
+                } else {
+                    Toast.makeText(this, getString(R.string.datos_invalidos), Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancelar", null)

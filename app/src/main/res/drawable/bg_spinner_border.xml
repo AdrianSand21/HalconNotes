@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Capa 1: Borde y Fondo -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFF" />
+            <stroke android:width="1dp" android:color="#D3D3D3" /> <!-- Gris claro -->
+            <corners android:radius="8dp" />
+            <padding android:left="12dp" android:top="12dp" android:right="40dp" android:bottom="12dp" /> <!-- Padding derecho extra para la flecha -->
+        </shape>
+    </item>
+    <!-- Capa 2: Icono de Flecha alineado a la derecha -->
+    <!-- Usamos el drawable directamente en el item, ya que ic_arrow_down es un VectorDrawable y no puede ir dentro de <bitmap> -->
+    <item 
+        android:drawable="@drawable/ic_arrow_down"
+        android:gravity="center_vertical|end" 
+        android:right="12dp" />
+</layer-list>

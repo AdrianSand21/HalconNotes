@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">HalconNotes</string>
+    <string-array name="grade_scale_options">
+        <item>Escala: 0 a 100 (Estándar)</item>
+        <item>Escala: 0 a 5.0 (Decimal)</item>
+        <item>Escala: A a F (Alfabética)</item>
+    </string-array>
+    <string name="current_scale_format">Escala actual: %1$s</string>
+    <string name="scale_saved">Escala guardada: %1$s</string>
+    <string name="choose_option">Elige una opción</string>
+    <string name="progreso_formato">Progreso: %1$s / 100 %%</string>
+    <string name="acumulado_formato">Acumulado: %1$s</string>
+    <string name="materia_completa">¡Materia Completa! (100%%)</string>
+    <string name="final_formato">FINAL: %1$s</string>
+    <string name="datos_invalidos">Datos inválidos (Use escala 0-100)</string>
+    <string name="datos_incompletos">Datos incompletos</string>
 </resources>

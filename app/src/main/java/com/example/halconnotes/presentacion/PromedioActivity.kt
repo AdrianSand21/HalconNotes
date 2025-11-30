@@ -7,9 +7,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.halconnotes.R
-import com.example.halconnotes.data.AppDatabase
 import com.example.halconnotes.control.PromedioViewModel
 import com.example.halconnotes.control.PromedioViewModelFactory
+import com.example.halconnotes.control.ScaleManager
 import com.example.halconnotes.data.BD
 
 class PromedioActivity : AppCompatActivity() {
@@ -24,6 +24,12 @@ class PromedioActivity : AppCompatActivity() {
         val txtPromedio = findViewById<TextView>(R.id.txtPromedioGeneral)
         val recycler = findViewById<RecyclerView>(R.id.recyclerMaterias)
         recycler.layoutManager = LinearLayoutManager(this)
+        
+        // Configuración del Toolbar y Navegación
+        val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
+        toolbar.setNavigationOnClickListener {
+            finish() // Cierra la actividad y regresa al menú principal
+        }
 
         // Crear ViewModel
         val dao = BD.getDatabase(this).cursoDao()
@@ -44,13 +50,10 @@ class PromedioActivity : AppCompatActivity() {
 
         // promedio general
         viewModel.promedio(idAlumno).observe(this) { promedio ->
-            txtPromedio.text = "%.2f".format(promedio ?: 0.0)
+            // Aplicar conversión de escala visual al promedio general
+            val currentScale = ScaleManager.getCurrentScale(this)
+            val promedioVisual = ScaleManager.convert(promedio ?: 0.0, currentScale)
+            txtPromedio.text = promedioVisual
         }
     }
 }
-
-
-
-
-
-

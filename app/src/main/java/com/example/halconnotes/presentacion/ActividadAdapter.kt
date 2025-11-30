@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.halconnotes.R
+import com.example.halconnotes.control.ScaleManager
 import com.example.halconnotes.data.Actividad
 
 class ActividadAdapter(
@@ -36,21 +37,28 @@ class ActividadAdapter(
 
         // 1. Mostrar el Nombre
         holder.tvNombre.text = actividad.nombre
+        
+        // Obtener la escala para formatear
+        val context = holder.itemView.context
+        val currentScale = ScaleManager.getCurrentScale(context)
 
-        // 2. Cálculo visual de puntos ganados
-        // Fórmula: (Calificación / 10) * Peso
-        // Ejemplo: (9.5 / 10) * 20% = 1.9 puntos reales
-        val puntosGanados = (actividad.calificacion / 10f) * actividad.peso
-
-        // Formato a 2 decimales para que se vea limpio (ej. "1.90")
+        // 2. Cálculo visual de puntos ganados (Numérico de aporte al total)
+        // Asumimos que ahora la BD guarda 0-100 (según instrucciones)
+        // Aporte = (Nota / 100) * Peso
+        val puntosGanados = (actividad.calificacion / 100f) * actividad.peso
         val puntosFormateados = String.format("%.2f", puntosGanados)
 
         // 3. Asignar textos
+        
         // EN GRANDE (AZUL): Puntos reales que suman al promedio
         holder.tvCalificacion.text = "$puntosFormateados pts"
 
         // EN PEQUEÑO (GRIS): Detalle de cuánto sacó y cuánto valía
-        holder.tvPeso.text = "Sacaste: ${actividad.calificacion}  (Peso: ${actividad.peso}%)"
+        // AQUÍ aplicamos la transformación visual de la nota sacada usando la nueva función `convert`
+        // Nota: convert espera Double. actividad.calificacion es Float (asumo).
+        val notaVisual = ScaleManager.convert(actividad.calificacion.toDouble(), currentScale)
+        
+        holder.tvPeso.text = "Sacaste: $notaVisual  (Peso: ${actividad.peso}%)"
 
         // 4. Configurar CLIC NORMAL -> Editar
         holder.itemView.setOnClickListener {

@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.halconnotes.R
+import com.example.halconnotes.control.ScaleManager
 import com.example.halconnotes.data.Curso
 
 class CursoAdapter(
@@ -16,6 +17,9 @@ class CursoAdapter(
 
     // La lista ahora es una variable interna
     private var listaCursos = emptyList<Curso>()
+    
+    // Flag para verificar si el adaptador está inicializado (útil en MainActivity)
+    val isInitialized: Boolean = true
 
     class CursoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvNombre: TextView = view.findViewById(R.id.tvNombreCurso)
@@ -31,9 +35,19 @@ class CursoAdapter(
     override fun onBindViewHolder(holder: CursoViewHolder, position: Int) {
         val curso = listaCursos[position]
         holder.tvNombre.text = curso.nombre
-        val promedioFormateado = String.format("%.2f", curso.promedioActual)
-        holder.tvPromedio.text = promedioFormateado
+        
+        // 1. Obtener la escala ACTUALIZADA desde las preferencias
+        // Es vital leerla aquí para que cada vez que se redibuje la lista (notifyDataSetChanged), tome el valor nuevo.
+        val context = holder.itemView.context
+        val currentScale = ScaleManager.getCurrentScale(context)
+        
+        // 2. Convertir el promedio base (0-100) a la escala visual
+        val promedioVisual = ScaleManager.convert(curso.promedioActual.toDouble(), currentScale)
+        
+        // 3. Mostrar el valor convertido
+        holder.tvPromedio.text = promedioVisual
 
+        // Listeners (mantener igual)
         holder.itemView.setOnClickListener { onCursoClick(position) }
         holder.itemView.setOnLongClickListener {
             onCursoLongClick(position)
