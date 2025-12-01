@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Asumo estos colores. AJUSTA si tus valores son diferentes. -->
-    <color name="primary">#0D47A1</color> <!-- Azul Oscuro/Fuerte para el encabezado y drawer -->
+    >
+    <color name="primary">#0D47A1</color>
     <color name="on_primary">#FFFFFF</color>
     <color name="secondary">#FFC107</color>
     <color name="on_secondary">#000000</color>

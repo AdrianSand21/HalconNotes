@@ -11,6 +11,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.HalconNotes">
+        
+        <!-- Nueva SplashActivity como LAUNCHER -->
+        <activity
+            android:name=".presentacion.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.NoActionBar"> <!-- Aseguramos NoActionBar para Splash -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity android:name=".presentacion.GraficaActivity" />
 
         <activity
@@ -18,14 +30,14 @@
             android:exported="true" />
 
         <activity android:name=".presentacion.NotasActivity" />
+        
+        <!-- MainActivity ya no es LAUNCHER, solo DEFAULT -->
         <activity
             android:name=".presentacion.MainActivity"
-
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT" /> <!-- Cambio importante -->
             </intent-filter>
         </activity>
 

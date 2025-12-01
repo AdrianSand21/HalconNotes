@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_layout_grafica"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
-    android:padding="16dp"
+    android:background="@android:color/white"
     tools:context=".presentacion.GraficaActivity">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:minHeight="?attr/actionBarSize"
+        android:background="@color/primary"
+        app:title="Gráfica de Progreso"
+        app:titleTextColor="@color/on_primary"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:navigationIconTint="@android:color/white"
+        android:elevation="4dp"/>
 
     <!-- Título de la gráfica -->
     <TextView
@@ -17,7 +30,7 @@
         android:textSize="26sp"
         android:textStyle="bold"
         android:textColor="#0D47A1"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/toolbar"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:elevation="4dp"/>
@@ -29,8 +42,7 @@
         android:layout_height="match_parent"
         android:layout_below="@id/tvTituloGrafica"
         android:layout_marginTop="16dp"
-        android:background="@color/background"/>
+        android:padding="16dp"
+        android:background="@android:color/white"/>
 
 </RelativeLayout>
-
-

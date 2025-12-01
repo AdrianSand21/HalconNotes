@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.halconnotes.R
 import com.example.halconnotes.control.ActividadViewModel
-import com.example.halconnotes.control.ScaleManager
+import com.example.halconnotes.control.EscalaManager
 import com.example.halconnotes.data.Actividad
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -28,6 +28,24 @@ class NotasActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notas)
 
+        // Habilitar modo pantalla completa (Edge-to-Edge)
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        val root = findViewById<android.view.View>(R.id.root_layout_notas)
+        val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
+
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
+            val systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+            
+            // 1. Arriba: Padding solo al Toolbar
+            toolbar.setPadding(0, systemBars.top, 0, 0)
+            
+            // 2. Abajo: Padding al contenedor raíz para proteger el contenido inferior
+            view.setPadding(0, 0, 0, systemBars.bottom)
+            
+            insets
+        }
+
         val nombreCurso = intent.getStringExtra("NOMBRE_CURSO") ?: "Curso"
         idCursoActual = intent.getIntExtra("ID_CURSO", -1)
 
@@ -38,7 +56,6 @@ class NotasActivity : AppCompatActivity() {
         }
         
         // CONFIGURACIÓN DEL TOOLBAR Y NAVEGACIÓN
-        val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
         toolbar.title = nombreCurso // Asigna el nombre de la materia al encabezado
         toolbar.setNavigationOnClickListener {
             finish() // Cierra la actividad
@@ -78,8 +95,8 @@ class NotasActivity : AppCompatActivity() {
                 sumaPuntos += puntosGanados
             }
             
-            val currentScale = ScaleManager.getCurrentScale(this)
-            val promedioVisual = ScaleManager.convert(sumaPuntos.toDouble(), currentScale)
+            val currentScale = EscalaManager.getCurrentScale(this)
+            val promedioVisual = EscalaManager.convert(sumaPuntos.toDouble(), currentScale)
 
             tvPesoTotal.text = getString(R.string.progreso_formato, String.format("%.0f", sumaPesos))
             tvCalificacionTotal.text = getString(R.string.acumulado_formato, promedioVisual)
@@ -114,8 +131,8 @@ class NotasActivity : AppCompatActivity() {
                     val puntosGanados = (act.calificacion / 100f) * act.peso
                     sumaPuntos += puntosGanados
                  }
-                 val currentScale = ScaleManager.getCurrentScale(this)
-                 val promedioVisual = ScaleManager.convert(sumaPuntos.toDouble(), currentScale)
+                 val currentScale = EscalaManager.getCurrentScale(this)
+                 val promedioVisual = EscalaManager.convert(sumaPuntos.toDouble(), currentScale)
                  
                  val tvPesoTotal = findViewById<TextView>(R.id.tvPesoTotal)
                  val tvCalificacionTotal = findViewById<TextView>(R.id.tvCalificacionTotal)
@@ -150,8 +167,8 @@ class NotasActivity : AppCompatActivity() {
         inputPeso.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         layout.addView(inputPeso)
         
-        val currentScale = ScaleManager.getCurrentScale(this)
-        val hint = ScaleManager.getHintForScale(currentScale)
+        val currentScale = EscalaManager.getCurrentScale(this)
+        val hint = EscalaManager.getHintForScale(currentScale)
 
         val inputNota = EditText(this)
         inputNota.hint = hint
@@ -166,7 +183,7 @@ class NotasActivity : AppCompatActivity() {
                 val peso = inputPeso.text.toString().toFloatOrNull()
                 val notaStr = inputNota.text.toString()
                 
-                val notaInterna = ScaleManager.parseGradeInput(notaStr, currentScale)
+                val notaInterna = EscalaManager.parseGradeInput(notaStr, currentScale)
 
                 if (nombre.isNotEmpty() && peso != null && notaInterna != null) {
                     val nuevaActividad = Actividad(
@@ -198,9 +215,9 @@ class NotasActivity : AppCompatActivity() {
         inputPeso.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         layout.addView(inputPeso)
         
-        val currentScale = ScaleManager.getCurrentScale(this)
+        val currentScale = EscalaManager.getCurrentScale(this)
         // Convertir nota interna (0-100) a escala actual para mostrar al usuario
-        val notaUsuario = ScaleManager.convert(actividad.calificacion.toDouble(), currentScale)
+        val notaUsuario = EscalaManager.convert(actividad.calificacion.toDouble(), currentScale)
 
         val inputNota = EditText(this)
         inputNota.setText(notaUsuario)
@@ -215,7 +232,7 @@ class NotasActivity : AppCompatActivity() {
                 val nuevoPeso = inputPeso.text.toString().toFloatOrNull()
                 val nuevaNotaStr = inputNota.text.toString()
                 
-                val nuevaNotaInterna = ScaleManager.parseGradeInput(nuevaNotaStr, currentScale)
+                val nuevaNotaInterna = EscalaManager.parseGradeInput(nuevaNotaStr, currentScale)
 
                 if (nuevoNombre.isNotEmpty() && nuevoPeso != null && nuevaNotaInterna != null) {
                     val actividadEditada = actividad.copy(

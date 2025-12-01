@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.HalconNotes" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@android:color/holo_purple</item>
-        <item name="colorPrimaryDark">@android:color/holo_purple</item>
-        <item name="colorAccent">@android:color/holo_blue_light</item>
+        <!-- Colores principales de la aplicación -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/secondary</item>
+        
+        <!-- CORRECCIÓN DE LA BARRA DE ESTADO -->
+        <!-- Esto pinta la barra superior del mismo azul que tu Toolbar -->
+        <item name="android:statusBarColor">@color/primary</item>
+        
+        <!-- Esto asegura que los iconos (hora, batería) sean BLANCOS -->
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 </resources>

@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.halconnotes.R
-import com.example.halconnotes.control.ScaleManager
+import com.example.halconnotes.control.EscalaManager
 import com.example.halconnotes.data.Curso
 
 class CursoAdapter(
@@ -39,10 +39,10 @@ class CursoAdapter(
         // 1. Obtener la escala ACTUALIZADA desde las preferencias
         // Es vital leerla aquí para que cada vez que se redibuje la lista (notifyDataSetChanged), tome el valor nuevo.
         val context = holder.itemView.context
-        val currentScale = ScaleManager.getCurrentScale(context)
+        val currentScale = EscalaManager.getCurrentScale(context)
         
         // 2. Convertir el promedio base (0-100) a la escala visual
-        val promedioVisual = ScaleManager.convert(curso.promedioActual.toDouble(), currentScale)
+        val promedioVisual = EscalaManager.convert(curso.promedioActual.toDouble(), currentScale)
         
         // 3. Mostrar el valor convertido
         holder.tvPromedio.text = promedioVisual

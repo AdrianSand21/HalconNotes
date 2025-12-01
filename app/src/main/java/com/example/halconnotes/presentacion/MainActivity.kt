@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
@@ -32,7 +31,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var fragmentContainer: FrameLayout
     private lateinit var rvCursos: RecyclerView
     private lateinit var fab: FloatingActionButton
-    private lateinit var btnPromedio: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +45,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Configuración del Toolbar para abrir el Drawer
         toolbar.setNavigationOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
+        }
+
+        // Listener para ocultar el Toolbar principal cuando se muestra un fragmento
+        supportFragmentManager.addOnBackStackChangedListener {
+            if (supportFragmentManager.backStackEntryCount > 0) {
+                // ESTAMOS EN EL FRAGMENTO (Escala)
+                fragmentContainer.visibility = View.VISIBLE
+                rvCursos.visibility = View.GONE
+                fab.visibility = View.GONE
+                // items de menú ya se manejan por separado
+                
+                // ¡OCULTAR EL TOOLBAR PRINCIPAL!
+                toolbar.visibility = View.GONE 
+            } else {
+                // ESTAMOS EN EL INICIO
+                fragmentContainer.visibility = View.GONE
+                rvCursos.visibility = View.VISIBLE
+                fab.visibility = View.VISIBLE
+                
+                // ¡MOSTRAR EL TOOLBAR PRINCIPAL!
+                toolbar.visibility = View.VISIBLE
+                
+                if (::adapter.isInitialized) {
+                    adapter.notifyDataSetChanged()
+                }
+            }
         }
 
         // Listener para el menú lateral
@@ -73,16 +97,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // 3. OBSERVAMOS la Base de Datos
         cursoViewModel.todosLosCursos.observe(this) { cursosCargados ->
             adapter.actualizarLista(cursosCargados)
+
+            // Habilitar el ítem del menú de la gráfica si la lista contiene datos
+            val menuGrafica = findViewById<NavigationView>(R.id.nav_view).menu.findItem(R.id.nav_grafica)
+            menuGrafica?.isEnabled = !cursosCargados.isNullOrEmpty()
         }
 
         fab = findViewById(R.id.fabAgregar)
         fab.setOnClickListener {
             mostrarDialogoAgregar()
-        }
-        btnPromedio = findViewById(R.id.btnPromedio)
-        btnPromedio.setOnClickListener {
-            val intent = Intent(this, PromedioActivity::class.java)
-            startActivity(intent)
         }
     }
 
@@ -97,6 +120,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.nav_promedio -> {
+                val intent = Intent(this, PromedioActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.nav_grafica -> {
+                val cursos = adapter.obtenerTodosLosCursos()
+                if (cursos.isNotEmpty()) {
+                    val nombres = ArrayList<String>()
+                    val promedios = FloatArray(cursos.size)
+                    cursos.forEachIndexed { index, curso ->
+                        nombres.add(curso.nombre)
+                        promedios[index] = curso.promedioActual
+                    }
+                    val intent = Intent(this, GraficaActivity::class.java)
+                    intent.putStringArrayListExtra("NOMBRES", nombres)
+                    intent.putExtra("PROMEDIOS", promedios)
+                    startActivity(intent)
+                } else {
+                    Toast.makeText(this, "No hay datos para graficar", Toast.LENGTH_SHORT).show()
+                }
+            }
             R.id.nav_grade_scale -> {
                 mostrarFragmentoConfiguracion()
             }
@@ -109,16 +153,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Ocultar elementos de la vista principal
         rvCursos.visibility = View.GONE
         fab.visibility = View.GONE
-        btnPromedio.visibility = View.GONE
         fragmentContainer.visibility = View.VISIBLE
+        val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
+        toolbar.visibility = View.GONE
 
         // Cargar el fragmento
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, GradeScaleFragment())
+            .addToBackStack(null) // Importante para que el listener funcione
             .commit()
-
-        // Cambiar título opcionalmente
-        // title = "Configuración"
     }
 
     // Manejo del botón atrás para cerrar el fragmento si está abierto
@@ -126,49 +169,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
-        } else if (fragmentContainer.visibility == View.VISIBLE) {
-            // Volver a mostrar la lista principal
-            fragmentContainer.visibility = View.VISIBLE
-            rvCursos.visibility = View.VISIBLE
-            fab.visibility = View.VISIBLE
-            btnPromedio.visibility = View.VISIBLE
-
-            // Quitar el fragmento
-            val fragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
-            if (fragment != null) {
-                supportFragmentManager.beginTransaction().remove(fragment).commit()
-            }
-
-            // Refrescar lista también al volver de fragmento
-            if (::adapter.isInitialized) {
-                adapter.notifyDataSetChanged()
-            }
+        } else if (supportFragmentManager.backStackEntryCount > 0) {
+             // Deja que el sistema maneje el popBackStack, lo que disparará nuestro listener
+            supportFragmentManager.popBackStack()
         } else {
             super.onBackPressed()
         }
-        val btnGrafica = findViewById<Button>(R.id.btnGrafica)
-        btnGrafica.setOnClickListener {
-            // Obtener todos los cursos del adapter
-            val cursos = adapter.obtenerTodosLosCursos()
-
-            // Crear listas separadas para nombres y promedios
-            val nombres = ArrayList<String>()
-            val promedios = FloatArray(cursos.size)
-
-            cursos.forEachIndexed { index, curso ->
-                nombres.add(curso.nombre)
-                promedios[index] = curso.promedioActual
-            }
-
-            // Crear Intent para GraficaActivity
-            val intent = Intent(this, GraficaActivity::class.java)
-            intent.putStringArrayListExtra("NOMBRES", nombres)
-            intent.putExtra("PROMEDIOS", promedios)
-
-            // Iniciar actividad
-            startActivity(intent)
-        }
-
     }
 
     // --- FUNCIONES DE DIÁLOGOS CONECTADAS A LA BD ---

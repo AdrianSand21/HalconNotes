@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/nav_grade_scale"
-        android:icon="@drawable/ic_school"
-        android:title="Escala de Calificación" />
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_promedio"
+            android:icon="@drawable/ic_menu_agenda"
+            android:title="Ver Promedio" />
+        <item
+            android:id="@+id/nav_grafica"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Ver Gráfica" />
+        <item
+            android:id="@+id/nav_grade_scale"
+            android:icon="@drawable/ic_school"
+            android:title="Escala de Calificación" />
+    </group>
 </menu>

@@ -29,11 +29,11 @@ class MateriasAdapter(
 
         // 1. Obtener la escala configurada actualmente
         val context = holder.itemView.context
-        val currentScale = com.example.halconnotes.control.ScaleManager.getCurrentScale(context)
+        val currentScale = com.example.halconnotes.control.EscalaManager.getCurrentScale(context)
 
         // 2. Convertir el promedio base (0-100) a la escala visual (0-5, A-F, etc.)
         // Es CRUCIAL usar esta conversión para que coincida con el resto de la app.
-        val promedioVisual = com.example.halconnotes.control.ScaleManager.convert(
+        val promedioVisual = com.example.halconnotes.control.EscalaManager.convert(
             curso.promedioActual.toDouble(), 
             currentScale
         )

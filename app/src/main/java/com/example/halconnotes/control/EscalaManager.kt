@@ -3,9 +3,8 @@ package com.example.halconnotes.control
 import android.content.Context
 import android.content.SharedPreferences
 import com.example.halconnotes.presentacion.GradeScaleFragment
-import android.text.InputType
 
-object ScaleManager {
+object EscalaManager {
 
     fun getCurrentScale(context: Context): String {
         val prefs: SharedPreferences = context.getSharedPreferences(GradeScaleFragment.PREFS_NAME, Context.MODE_PRIVATE)

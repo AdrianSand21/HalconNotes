@@ -8,18 +8,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.example.halconnotes.R
+import com.google.android.material.appbar.MaterialToolbar
 
 class GradeScaleFragment : Fragment() {
 
     private lateinit var spinnerGradeScale: Spinner
     private lateinit var tvCurrentScale: TextView
-    private lateinit var btnBack: ImageButton
 
     companion object {
         const val PREFS_NAME = "AjustesDeCalificaciones"
@@ -35,10 +35,9 @@ class GradeScaleFragment : Fragment() {
 
         spinnerGradeScale = view.findViewById(R.id.spinner_grade_scale)
         tvCurrentScale = view.findViewById(R.id.text_view_current_scale)
-        btnBack = view.findViewById(R.id.button_back_to_main)
 
         setupSpinner()
-        setupNavigation()
+        setupNavigation(view)
 
         return view
     }
@@ -100,16 +99,10 @@ class GradeScaleFragment : Fragment() {
         Toast.makeText(requireContext(), "Escala guardada: $scale", Toast.LENGTH_SHORT).show()
     }
 
-    private fun setupNavigation() {
-        btnBack.setOnClickListener {
-            // Priorizar navegación segura
-            if (activity is MainActivity) {
-                 // Como estamos manejando fragmentos manualmente en MainActivity
-                 requireActivity().onBackPressed()
-            } else {
-                // Fallback genérico
-                 requireActivity().onBackPressed()
-            }
+    private fun setupNavigation(view: View) {
+        val toolbar = view.findViewById<Toolbar>(R.id.toolbar_scale)
+        toolbar.setNavigationOnClickListener {
+            requireActivity().onBackPressed()
         }
     }
 }

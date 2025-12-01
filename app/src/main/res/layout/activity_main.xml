@@ -5,6 +5,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".presentacion.MainActivity">
 
     <!-- Contenido principal -->
@@ -18,16 +19,18 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/primary"
-            app:title="HalconNotes"
-            app:titleTextColor="@color/on_primary"
             android:elevation="4dp"
-            app:navigationIcon="@android:drawable/ic_menu_sort_by_size" />
+            app:navigationIcon="@android:drawable/ic_menu_sort_by_size"
+            app:title="HalconNotes"
+            app:titleTextColor="@color/white"
+            android:textStyle="bold"/>
 
-        <!-- Contenedor para fragmentos superpuestos (opcional si usas reemplazo total) -->
+        <!-- Contenedor para fragmentos superpuestos -->
         <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
             android:layout_below="@id/toolbar"
             android:elevation="5dp"
             android:visibility="gone"/>
@@ -36,45 +39,11 @@
             android:id="@+id/rvCursos"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
             android:layout_below="@id/toolbar"
             android:paddingTop="8dp"
-            android:paddingBottom="150dp"
+            android:paddingBottom="80dp"
             android:clipToPadding="false" />
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"
-        android:gravity="center">
-
-        <Button
-            android:id="@+id/btnPromedio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ver promedio"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
-            android:backgroundTint="@color/secondary"
-            android:elevation="10dp"
-            android:layout_marginBottom="16dp"/>
-
-        <Button
-            android:id="@+id/btnGrafica"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ver gráfica"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
-            android:backgroundTint="@color/secondary"
-            android:elevation="10dp"
-            android:layout_marginBottom="16dp"/>
-
-    </LinearLayout>
-
-
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabAgregar"
@@ -90,7 +59,7 @@
 
     </RelativeLayout>
 
-    <!-- Navigation Drawer. Cambios: Fondo a primary, Iconos/Texto a blanco. -->
+    <!-- Navigation Drawer. -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
