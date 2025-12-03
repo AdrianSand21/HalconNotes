@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.halconnotes.R
 import com.example.halconnotes.control.ActividadViewModel
-import com.example.halconnotes.control.EscalaManager
+import com.example.halconnotes.control.EscalaManager // <--- IMPORTANTE
 import com.example.halconnotes.data.Actividad
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -24,25 +24,21 @@ class NotasActivity : AppCompatActivity() {
     private lateinit var adapter: ActividadAdapter
     private var idCursoActual: Int = -1
 
+    // Variable para controlar el peso acumulado
+    private var pesoAcumuladoActual: Float = 0f
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notas)
 
-        // Habilitar modo pantalla completa (Edge-to-Edge)
+        // Configuración Edge-to-Edge (Barra transparente)
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
-
         val root = findViewById<android.view.View>(R.id.root_layout_notas)
         val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar)
-
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
             val systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
-            
-            // 1. Arriba: Padding solo al Toolbar
             toolbar.setPadding(0, systemBars.top, 0, 0)
-            
-            // 2. Abajo: Padding al contenedor raíz para proteger el contenido inferior
             view.setPadding(0, 0, 0, systemBars.bottom)
-            
             insets
         }
 
@@ -54,49 +50,47 @@ class NotasActivity : AppCompatActivity() {
             finish()
             return
         }
-        
-        // CONFIGURACIÓN DEL TOOLBAR Y NAVEGACIÓN
-        toolbar.title = nombreCurso // Asigna el nombre de la materia al encabezado
-        toolbar.setNavigationOnClickListener {
-            finish() // Cierra la actividad
-        }
 
-        // Eliminamos referencia al antiguo título
-        // val tvTitulo = findViewById<TextView>(R.id.tvTituloMateria)
+        toolbar.title = nombreCurso
+        toolbar.setNavigationOnClickListener { finish() }
+
         val tvPesoTotal = findViewById<TextView>(R.id.tvPesoTotal)
         val tvCalificacionTotal = findViewById<TextView>(R.id.tvCalificacionTotal)
         val rvNotas = findViewById<RecyclerView>(R.id.rvNotas)
         val fab = findViewById<FloatingActionButton>(R.id.fabAgregarNota)
 
-        // tvTitulo.text = nombreCurso // Ya lo hace el toolbar
-
         rvNotas.layoutManager = LinearLayoutManager(this)
 
+        // Obtenemos la escala actual guardada (Módulo 5)
+        val escalaActual = EscalaManager.getCurrentScale(this)
+
+        // Configurar Adapter
         adapter = ActividadAdapter(
-            onItemClick = { actividad ->
-                mostrarDialogoEditarActividad(actividad)
-            },
-            onLongClick = { actividad ->
-                mostrarDialogoEliminar(actividad)
-            }
+            onItemClick = { actividad -> mostrarDialogoEditarActividad(actividad, escalaActual) },
+            onLongClick = { actividad -> mostrarDialogoEliminar(actividad) }
         )
+        // Le decimos al adaptador qué escala usar para mostrar los datos (Módulo 5)
+        adapter.setEscala(escalaActual)
         rvNotas.adapter = adapter
 
+        // Observar datos
         actividadViewModel.obtenerActividadesDeCurso(idCursoActual).observe(this) { actividades ->
             adapter.actualizarLista(actividades)
 
+            // Cálculos del resumen
             var sumaPesos = 0f
             var sumaPuntos = 0f
 
             for (act in actividades) {
                 sumaPesos += act.peso
-                // Siempre dividir entre 100f porque 'act.calificacion' es base 100
-                val puntosGanados = (act.calificacion / 100f) * act.peso
-                sumaPuntos += puntosGanados
+                // La BD siempre tiene base 100, así que dividimos entre 100f
+                sumaPuntos += (act.calificacion / 100f) * act.peso
             }
-            
-            val currentScale = EscalaManager.getCurrentScale(this)
-            val promedioVisual = EscalaManager.convert(sumaPuntos.toDouble(), currentScale)
+
+            pesoAcumuladoActual = sumaPesos // Guardamos para validar después
+
+            // Mostramos el promedio convertido a la escala del usuario
+            val promedioVisual = EscalaManager.convert(sumaPuntos.toDouble(), escalaActual)
 
             tvPesoTotal.text = getString(R.string.progreso_formato, String.format("%.0f", sumaPesos))
             tvCalificacionTotal.text = getString(R.string.acumulado_formato, promedioVisual)
@@ -113,65 +107,45 @@ class NotasActivity : AppCompatActivity() {
         }
 
         fab.setOnClickListener {
-            mostrarDialogoAgregarNota()
-        }
-    }
-    
-    override fun onResume() {
-        super.onResume()
-        if (idCursoActual != -1) {
-             adapter.notifyDataSetChanged()
-             // También refrescar los cálculos totales
-             actividadViewModel.obtenerActividadesDeCurso(idCursoActual).value?.let { actividades ->
-                 var sumaPesos = 0f
-                 var sumaPuntos = 0f
-                 for (act in actividades) {
-                    sumaPesos += act.peso
-                    // Siempre dividir entre 100f porque 'act.calificacion' es base 100
-                    val puntosGanados = (act.calificacion / 100f) * act.peso
-                    sumaPuntos += puntosGanados
-                 }
-                 val currentScale = EscalaManager.getCurrentScale(this)
-                 val promedioVisual = EscalaManager.convert(sumaPuntos.toDouble(), currentScale)
-                 
-                 val tvPesoTotal = findViewById<TextView>(R.id.tvPesoTotal)
-                 val tvCalificacionTotal = findViewById<TextView>(R.id.tvCalificacionTotal)
-                 
-                 // Re-aplicar lógica de UI
-                 if (sumaPesos >= 100f) {
-                     tvPesoTotal.setTextColor(ContextCompat.getColor(this, R.color.verde_completo))
-                     tvPesoTotal.text = getString(R.string.materia_completa)
-                     tvCalificacionTotal.text = getString(R.string.final_formato, promedioVisual)
-                     tvCalificacionTotal.textSize = 22f
-                 } else {
-                     tvPesoTotal.setTextColor(android.graphics.Color.BLACK)
-                     tvPesoTotal.text = getString(R.string.progreso_formato, String.format("%.0f", sumaPesos))
-                     tvCalificacionTotal.text = getString(R.string.acumulado_formato, promedioVisual)
-                     tvCalificacionTotal.textSize = 18f
-                 }
-             }
+            // Validación Opcional: No abrir si ya está lleno
+            if (pesoAcumuladoActual >= 100f) {
+                Toast.makeText(this, "El curso ya tiene el 100% de peso", Toast.LENGTH_SHORT).show()
+            } else {
+                mostrarDialogoAgregarNota(escalaActual)
+            }
         }
     }
 
-    private fun mostrarDialogoAgregarNota() {
+    // Necesario para refrescar si cambias la escala en configuración y vuelves
+    override fun onResume() {
+        super.onResume()
+        if (::adapter.isInitialized) {
+            val nuevaEscala = EscalaManager.getCurrentScale(this)
+            adapter.setEscala(nuevaEscala)
+            // Forzar refresh de los cálculos de totales (re-lanzar observer indirectamente o recalcular UI)
+            // Nota: El observer de LiveData se encarga si la data cambia, pero si solo cambia la config
+            // a veces es necesario notificar al adapter.
+        }
+    }
+
+    // --- DIÁLOGO AGREGAR ---
+    private fun mostrarDialogoAgregarNota(escala: String) {
         val layout = LinearLayout(this)
         layout.orientation = LinearLayout.VERTICAL
         layout.setPadding(50, 20, 50, 20)
 
         val inputNombre = EditText(this)
-        inputNombre.hint = "Nombre (Ej. Examen 1)"
+        inputNombre.hint = "Nombre (Ej. Examen)"
         layout.addView(inputNombre)
 
         val inputPeso = EditText(this)
-        inputPeso.hint = "Peso % (Ej. 30)"
+        inputPeso.hint = "Peso % (Disponible: ${100 - pesoAcumuladoActual}%)"
         inputPeso.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         layout.addView(inputPeso)
-        
-        val currentScale = EscalaManager.getCurrentScale(this)
-        val hint = EscalaManager.getHintForScale(currentScale)
 
         val inputNota = EditText(this)
-        inputNota.hint = hint
+        // El hint cambia según la escala (ej: "0-5" o "0-100") gracias a EscalaManager
+        inputNota.hint = EscalaManager.getHintForScale(escala)
         inputNota.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         layout.addView(inputNota)
 
@@ -181,16 +155,24 @@ class NotasActivity : AppCompatActivity() {
             .setPositiveButton("Guardar") { _, _ ->
                 val nombre = inputNombre.text.toString()
                 val peso = inputPeso.text.toString().toFloatOrNull()
-                val notaStr = inputNota.text.toString()
-                
-                val notaInterna = EscalaManager.parseGradeInput(notaStr, currentScale)
+                val notaString = inputNota.text.toString()
 
-                if (nombre.isNotEmpty() && peso != null && notaInterna != null) {
+                // 1. Usamos EscalaManager para convertir lo que escribió el usuario a Base 100
+                val notaNormalizada = EscalaManager.parseGradeInput(notaString, escala)
+
+                if (nombre.isNotEmpty() && peso != null && notaNormalizada != null) {
+
+                    // VALIDACIÓN 1: El peso no puede superar el 100%
+                    if (pesoAcumuladoActual + peso > 100.1f) { // Margen pequeño de error flotante
+                        Toast.makeText(this, "Error: El peso total superaría el 100%", Toast.LENGTH_LONG).show()
+                        return@setPositiveButton
+                    }
+
                     val nuevaActividad = Actividad(
                         id_curso = idCursoActual,
                         nombre = nombre,
                         peso = peso,
-                        calificacion = notaInterna
+                        calificacion = notaNormalizada // Guardamos siempre en base 100
                     )
                     actividadViewModel.insertarActividad(nuevaActividad)
                 } else {
@@ -201,7 +183,8 @@ class NotasActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun mostrarDialogoEditarActividad(actividad: Actividad) {
+    // --- DIÁLOGO EDITAR ---
+    private fun mostrarDialogoEditarActividad(actividad: Actividad, escala: String) {
         val layout = LinearLayout(this)
         layout.orientation = LinearLayout.VERTICAL
         layout.setPadding(50, 20, 50, 20)
@@ -214,13 +197,11 @@ class NotasActivity : AppCompatActivity() {
         inputPeso.setText(actividad.peso.toString())
         inputPeso.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         layout.addView(inputPeso)
-        
-        val currentScale = EscalaManager.getCurrentScale(this)
-        // Convertir nota interna (0-100) a escala actual para mostrar al usuario
-        val notaUsuario = EscalaManager.convert(actividad.calificacion.toDouble(), currentScale)
 
         val inputNota = EditText(this)
-        inputNota.setText(notaUsuario)
+        // Al editar, convertimos de base 100 a la escala del usuario para que vea su número original
+        val notaVisual = EscalaManager.convert(actividad.calificacion.toDouble(), escala)
+        inputNota.setText(notaVisual)
         inputNota.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
         layout.addView(inputNota)
 
@@ -231,14 +212,22 @@ class NotasActivity : AppCompatActivity() {
                 val nuevoNombre = inputNombre.text.toString()
                 val nuevoPeso = inputPeso.text.toString().toFloatOrNull()
                 val nuevaNotaStr = inputNota.text.toString()
-                
-                val nuevaNotaInterna = EscalaManager.parseGradeInput(nuevaNotaStr, currentScale)
 
-                if (nuevoNombre.isNotEmpty() && nuevoPeso != null && nuevaNotaInterna != null) {
+                // Convertimos de regreso a base 100
+                val nuevaNotaNormalizada = EscalaManager.parseGradeInput(nuevaNotaStr, escala)
+
+                if (nuevoNombre.isNotEmpty() && nuevoPeso != null && nuevaNotaNormalizada != null) {
+                    // Validar peso restando el anterior y sumando el nuevo
+                    val pesoDiferencia = nuevoPeso - actividad.peso
+                    if (pesoAcumuladoActual + pesoDiferencia > 100.1f) {
+                        Toast.makeText(this, "Error: El nuevo peso supera el 100%", Toast.LENGTH_SHORT).show()
+                        return@setPositiveButton
+                    }
+
                     val actividadEditada = actividad.copy(
                         nombre = nuevoNombre,
                         peso = nuevoPeso,
-                        calificacion = nuevaNotaInterna
+                        calificacion = nuevaNotaNormalizada
                     )
                     actividadViewModel.actualizarActividad(actividadEditada)
                 } else {

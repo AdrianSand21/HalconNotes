@@ -36,35 +36,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Inicialización de vistas para navegación y drawer
         drawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         val toolbar: MaterialToolbar = findViewById(R.id.toolbar)
         fragmentContainer = findViewById(R.id.fragment_container)
 
-        // Configuración del Toolbar para abrir el Drawer
         toolbar.setNavigationOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
         }
 
-        // Listener para ocultar el Toolbar principal cuando se muestra un fragmento
         supportFragmentManager.addOnBackStackChangedListener {
             if (supportFragmentManager.backStackEntryCount > 0) {
-                // ESTAMOS EN EL FRAGMENTO (Escala)
                 fragmentContainer.visibility = View.VISIBLE
                 rvCursos.visibility = View.GONE
                 fab.visibility = View.GONE
-                // items de menú ya se manejan por separado
                 
                 // ¡OCULTAR EL TOOLBAR PRINCIPAL!
                 toolbar.visibility = View.GONE 
             } else {
-                // ESTAMOS EN EL INICIO
                 fragmentContainer.visibility = View.GONE
                 rvCursos.visibility = View.VISIBLE
                 fab.visibility = View.VISIBLE
-                
-                // ¡MOSTRAR EL TOOLBAR PRINCIPAL!
+
                 toolbar.visibility = View.VISIBLE
                 
                 if (::adapter.isInitialized) {
@@ -94,11 +87,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         )
         rvCursos.adapter = adapter
 
-        // 3. OBSERVAMOS la Base de Datos
         cursoViewModel.todosLosCursos.observe(this) { cursosCargados ->
             adapter.actualizarLista(cursosCargados)
 
-            // Habilitar el ítem del menú de la gráfica si la lista contiene datos
             val menuGrafica = findViewById<NavigationView>(R.id.nav_view).menu.findItem(R.id.nav_grafica)
             menuGrafica?.isEnabled = !cursosCargados.isNullOrEmpty()
         }
@@ -111,8 +102,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onResume() {
         super.onResume()
-        // Forzamos al adaptador a redibujar la lista.
-        // Como el adaptador lee la escala en 'onBindViewHolder', esto actualizará el formato (ej. de 100 a 5.0) instantáneamente.
         if (::adapter.isInitialized) {
             adapter.notifyDataSetChanged()
         }
@@ -150,21 +139,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun mostrarFragmentoConfiguracion() {
-        // Ocultar elementos de la vista principal
         rvCursos.visibility = View.GONE
         fab.visibility = View.GONE
         fragmentContainer.visibility = View.VISIBLE
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
         toolbar.visibility = View.GONE
 
-        // Cargar el fragmento
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, GradeScaleFragment())
             .addToBackStack(null) // Importante para que el listener funcione
             .commit()
     }
 
-    // Manejo del botón atrás para cerrar el fragmento si está abierto
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -176,8 +162,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             super.onBackPressed()
         }
     }
-
-    // --- FUNCIONES DE DIÁLOGOS CONECTADAS A LA BD ---
 
     private fun mostrarDialogoAgregar() {
         val input = EditText(this)

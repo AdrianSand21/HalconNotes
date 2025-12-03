@@ -6,24 +6,24 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.halconnotes.R
-import com.example.halconnotes.control.EscalaManager
+import com.example.halconnotes.control.EscalaManager // <--- Asegúrate de tener este import
 import com.example.halconnotes.data.Actividad
 
 class ActividadAdapter(
-    // Recibimos dos acciones:
-    // 1. onItemClick -> Para EDITAR (Clic normal)
-    // 2. onLongClick -> Para ELIMINAR (Clic largo)
+    // Recibimos dos acciones: Editar (Click) y Eliminar (LongClick)
     private val onItemClick: (Actividad) -> Unit,
     private val onLongClick: (Actividad) -> Unit
 ) : RecyclerView.Adapter<ActividadAdapter.ActividadViewHolder>() {
 
     private var listaActividades = emptyList<Actividad>()
 
+    // Variable para guardar la escala actual (Por defecto 0-100)
+    private var escalaActual: String = "Escala: 0 a 100 (Estándar)"
+
     class ActividadViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        // Referencias a los elementos del diseño item_nota.xml
         val tvNombre: TextView = view.findViewById(R.id.tvNombreActividad)
-        val tvCalificacion: TextView = view.findViewById(R.id.tvCalificacion) // Texto Grande Azul
-        val tvPeso: TextView = view.findViewById(R.id.tvPeso) // Texto Pequeño Gris
+        val tvCalificacion: TextView = view.findViewById(R.id.tvCalificacion)
+        val tvPeso: TextView = view.findViewById(R.id.tvPeso)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActividadViewHolder {
@@ -35,48 +35,40 @@ class ActividadAdapter(
     override fun onBindViewHolder(holder: ActividadViewHolder, position: Int) {
         val actividad = listaActividades[position]
 
-        // 1. Mostrar el Nombre
         holder.tvNombre.text = actividad.nombre
-        
-        // Obtener la escala para formatear
-        val context = holder.itemView.context
-        val currentScale = EscalaManager.getCurrentScale(context)
 
-        // 2. Cálculo visual de puntos ganados (Numérico de aporte al total)
-        // Asumimos que ahora la BD guarda 0-100 (según instrucciones)
-        // Aporte = (Nota / 100) * Peso
+        // 1. Cálculo de puntos ganados (Base 100) para el texto grande
+        // (NotaBase100 / 100) * Peso
         val puntosGanados = (actividad.calificacion / 100f) * actividad.peso
         val puntosFormateados = String.format("%.2f", puntosGanados)
-
-        // 3. Asignar textos
-        
-        // EN GRANDE (AZUL): Puntos reales que suman al promedio
         holder.tvCalificacion.text = "$puntosFormateados pts"
 
-        // EN PEQUEÑO (GRIS): Detalle de cuánto sacó y cuánto valía
-        // AQUÍ aplicamos la transformación visual de la nota sacada usando la nueva función `convert`
-        // Nota: convert espera Double. actividad.calificacion es Float (asumo).
-        val notaVisual = EscalaManager.convert(actividad.calificacion.toDouble(), currentScale)
-        
-        holder.tvPeso.text = "Sacaste: $notaVisual  (Peso: ${actividad.peso}%)"
+        // 2. Cálculo visual de la nota original según la escala
+        // Usamos EscalaManager para convertir el "80" de la BD a "4.0" o "B" si es necesario
+        val notaVisual = EscalaManager.convert(actividad.calificacion.toDouble(), escalaActual)
 
-        // 4. Configurar CLIC NORMAL -> Editar
-        holder.itemView.setOnClickListener {
-            onItemClick(actividad)
-        }
+        // Texto pequeño
+        holder.tvPeso.text = "Sacaste: $notaVisual  (Valía ${actividad.peso}%)"
 
-        // 5. Configurar CLIC LARGO -> Eliminar
+        // Listeners
+        holder.itemView.setOnClickListener { onItemClick(actividad) }
         holder.itemView.setOnLongClickListener {
             onLongClick(actividad)
-            true // 'true' indica que ya manejamos el evento
+            true
         }
     }
 
     override fun getItemCount() = listaActividades.size
 
-    // Función para actualizar la lista desde la Activity
     fun actualizarLista(nuevasActividades: List<Actividad>) {
         this.listaActividades = nuevasActividades
+        notifyDataSetChanged()
+    }
+
+    // 👇 ESTA ES LA FUNCIÓN QUE TE FALTABA Y CAUSABA EL ERROR 👇
+    fun setEscala(nuevaEscala: String) {
+        this.escalaActual = nuevaEscala
+        // Al cambiar la escala, refrescamos la lista para que los números cambien (ej. de 80 a 4.0)
         notifyDataSetChanged()
     }
 }
