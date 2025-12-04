@@ -148,7 +148,7 @@ class NotasActivity : AppCompatActivity() {
             .setTitle("Nueva Actividad")
             .setView(layout)
             .setPositiveButton("Guardar") { _, _ ->
-                val nombre = inputNombre.text.toString()
+                val nombre = inputNombre.text.toString().trim()
                 val peso = inputPeso.text.toString().toFloatOrNull()
                 val notaString = inputNota.text.toString()
                 val notaNormalizada = EscalaManager.parseGradeInput(notaString, escala)
@@ -201,7 +201,7 @@ class NotasActivity : AppCompatActivity() {
             .setTitle("Editar Actividad")
             .setView(layout)
             .setPositiveButton("Actualizar") { _, _ ->
-                val nuevoNombre = inputNombre.text.toString()
+                val nuevoNombre = inputNombre.text.toString().trim()
                 val nuevoPeso = inputPeso.text.toString().toFloatOrNull()
                 val nuevaNotaStr = inputNota.text.toString()
                 val nuevaNotaNormalizada = EscalaManager.parseGradeInput(nuevaNotaStr, escala)

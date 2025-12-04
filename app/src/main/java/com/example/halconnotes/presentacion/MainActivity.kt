@@ -20,6 +20,7 @@ import com.example.halconnotes.data.Curso
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import android.text.InputFilter
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -31,6 +32,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var fragmentContainer: FrameLayout
     private lateinit var rvCursos: RecyclerView
     private lateinit var fab: FloatingActionButton
+
+    // Filtro para Módulo 1: Letras, Números y Espacios (sin símbolos raros)
+    private val filtroNombreMateria = InputFilter { source, start, end, _, _, _ ->
+        for (i in start until end) {
+            // Acepta si es letra, dígito o espacio en blanco
+            if (!Character.isLetterOrDigit(source[i]) && !Character.isSpaceChar(source[i])) {
+                return@InputFilter "" // Rechaza el carácter
+            }
+        }
+        null // Acepta el carácter
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -167,14 +179,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val input = EditText(this)
         input.hint = "Ej. Programación Lógica"
 
+        input.filters = arrayOf(
+            InputFilter.LengthFilter(30), // Máximo 30 caracteres
+            filtroNombreMateria           // Solo letras, números y espacios
+        )
+
         AlertDialog.Builder(this)
             .setTitle("Nueva Materia")
             .setView(input)
             .setPositiveButton("Guardar") { _, _ ->
-                val nombre = input.text.toString()
+                val nombre = input.text.toString().trim()
                 if (nombre.isNotEmpty()) {
                     val nuevoCurso = Curso(id_alumno = 1, nombre = nombre)
                     cursoViewModel.insertarCurso(nuevoCurso)
+                } else {
+                    Toast.makeText(this, "El nombre no puede estar vacío", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancelar", null)
@@ -186,14 +205,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val input = EditText(this)
         input.setText(cursoActual.nombre)
 
+        input.filters = arrayOf(
+            InputFilter.LengthFilter(30), // Máximo 30 caracteres
+            filtroNombreMateria           // Solo letras, números y espacios
+        )
+
         AlertDialog.Builder(this)
             .setTitle("Renombrar Materia")
             .setView(input)
             .setPositiveButton("Actualizar") { _, _ ->
-                val nuevoNombre = input.text.toString()
+                val nuevoNombre = input.text.toString().trim()
                 if (nuevoNombre.isNotEmpty()) {
                     val cursoEditado = cursoActual.copy(nombre = nuevoNombre)
                     cursoViewModel.actualizarCurso(cursoEditado)
+                } else {
+                    Toast.makeText(this, "El nombre no puede estar vacío", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancelar", null)
