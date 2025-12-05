@@ -88,18 +88,21 @@ class GraficaActivity : AppCompatActivity() {
             (barChart.data?.getDataSetByIndex(0) as? BarDataSet)?.valueFormatter =
                 object : ValueFormatter() {
                     override fun getFormattedValue(value: Float): String {
-                        return when (kotlin.math.round(value).toInt()) {
-                            4 -> "A"
-                            3 -> "B"
-                            2 -> "C"
-                            1 -> "D"
-                            0 -> "F"
-                            else -> ""
+                        return if (isAlfabetica) {
+                            return when (kotlin.math.round(value).toInt()) {
+                                4 -> "A"
+                                3 -> "B"
+                                2 -> "C"
+                                1 -> "D"
+                                0 -> "F"
+                                else -> ""
+                            }
+                        } else {
+                            // Escala numérica: mostrar valor con 1 decimal
+                            String.format("%.1f", value)
                         }
                     }
                 }
-
-
             entries.add(BarEntry(index.toFloat(), valor))
         }
 
