@@ -17,12 +17,12 @@ object EscalaManager {
         prefs.edit().putString(GradeScaleFragment.KEY_SELECTED_SCALE, scale).apply()
     }
 
-    // CORRECCIÓN CRÍTICA: El divisor para 0-100 debe ser 100f, NO 10f.
+
     fun getNumericScaleMax(scale: String): Float {
         return when {
             scale.contains("0 a 5") -> 5.0f
             scale.contains("A a F") -> 100f // Base interna 100
-            // Para "0 a 100" y CUALQUIER otro caso por defecto, el máximo es 100.
+
             else -> 100f 
         }
     }

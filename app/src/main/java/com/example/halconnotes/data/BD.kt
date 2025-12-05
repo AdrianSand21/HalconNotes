@@ -1,4 +1,4 @@
-package com.example.halconnotes.data // Ajusta este paquete si tu app se llama diferente
+package com.example.halconnotes.data
 
 import android.content.Context
 import androidx.room.Database
@@ -17,7 +17,6 @@ abstract class BD : RoomDatabase() {
     abstract fun cursoDao(): CursoDao
     abstract fun actividadDao(): ActividadDao
 
-    // Patrón Singleton (permite una única instancia de la BD)
     companion object {
         @Volatile
         private var INSTANCE: BD? = null
@@ -27,9 +26,8 @@ abstract class BD : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     BD::class.java,
-                    "proyectotap_db" // Nombre del archivo físico de SQLite
+                    "proyectotap_db"
                 )
-                    // Usamos esto para recrear la BD si la estructura cambia (necesario al subir la versión a 2)
                     .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance

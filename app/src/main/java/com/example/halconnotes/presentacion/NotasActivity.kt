@@ -39,6 +39,7 @@ class NotasActivity : AppCompatActivity() {
             view.setPadding(0, 0, 0, systemBars.bottom)
             insets
         }
+
         val nombreCurso = intent.getStringExtra("NOMBRE_CURSO") ?: "Curso"
         idCursoActual = intent.getIntExtra("ID_CURSO", -1)
         if (idCursoActual == -1) {
@@ -57,15 +58,12 @@ class NotasActivity : AppCompatActivity() {
 
         rvNotas.layoutManager = LinearLayoutManager(this)
 
-        // Obtenemos la escala actual guardada (Módulo 5)
         val escalaActual = EscalaManager.getCurrentScale(this)
 
-        // Configurar Adapter
         adapter = ActividadAdapter(
             onItemClick = { actividad -> mostrarDialogoEditarActividad(actividad, escalaActual) },
             onLongClick = { actividad -> mostrarDialogoEliminar(actividad) }
         )
-        // Le decimos al adaptador qué escala usar para mostrar los datos (Módulo 5)
         adapter.setEscala(escalaActual)
         rvNotas.adapter = adapter
 
@@ -108,15 +106,11 @@ class NotasActivity : AppCompatActivity() {
         }
     }
 
-    // Necesario para refrescar si cambias la escala en configuración y vuelves
     override fun onResume() {
         super.onResume()
         if (::adapter.isInitialized) {
             val nuevaEscala = EscalaManager.getCurrentScale(this)
             adapter.setEscala(nuevaEscala)
-            // Forzar refresh de los cálculos de totales (re-lanzar observer indirectamente o recalcular UI)
-            // Nota: El observer de LiveData se encarga si la data cambia, pero si solo cambia la config
-            // a veces es necesario notificar al adapter.
         }
     }
 

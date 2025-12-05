@@ -33,15 +33,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var rvCursos: RecyclerView
     private lateinit var fab: FloatingActionButton
 
-    // Filtro para Módulo 1: Letras, Números y Espacios (sin símbolos raros)
     private val filtroNombreMateria = InputFilter { source, start, end, _, _, _ ->
         for (i in start until end) {
-            // Acepta si es letra, dígito o espacio en blanco
             if (!Character.isLetterOrDigit(source[i]) && !Character.isSpaceChar(source[i])) {
-                return@InputFilter "" // Rechaza el carácter
+                return@InputFilter ""
             }
         }
-        null // Acepta el carácter
+        null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

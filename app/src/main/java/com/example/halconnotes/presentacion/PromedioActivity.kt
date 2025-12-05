@@ -46,7 +46,7 @@ class PromedioActivity : AppCompatActivity() {
         
         // Configuración del Toolbar y Navegación
         (toolbar as com.google.android.material.appbar.MaterialToolbar).setNavigationOnClickListener {
-            finish() // Cierra la actividad y regresa al menú principal
+            finish()
         }
 
         // Crear ViewModel

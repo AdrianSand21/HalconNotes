@@ -6,6 +6,6 @@ import androidx.room.OnConflictStrategy
 
 @Dao
 interface AlumnoDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE) // <--- IMPORTANTE: IGNORE
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertarAlumno(alumno: Alumno)
 }

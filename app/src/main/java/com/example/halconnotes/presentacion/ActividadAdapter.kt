@@ -38,13 +38,11 @@ class ActividadAdapter(
         holder.tvNombre.text = actividad.nombre
 
         // 1. Cálculo de puntos ganados (Base 100) para el texto grande
-        // (NotaBase100 / 100) * Peso
         val puntosGanados = (actividad.calificacion / 100f) * actividad.peso
         val puntosFormateados = String.format("%.2f", puntosGanados)
         holder.tvCalificacion.text = "$puntosFormateados pts"
 
         // 2. Cálculo visual de la nota original según la escala
-        // Usamos EscalaManager para convertir el "80" de la BD a "4.0" o "B" si es necesario
         val notaVisual = EscalaManager.convert(actividad.calificacion.toDouble(), escalaActual)
 
         // Texto pequeño
@@ -65,7 +63,6 @@ class ActividadAdapter(
         notifyDataSetChanged()
     }
 
-    // 👇 ESTA ES LA FUNCIÓN QUE TE FALTABA Y CAUSABA EL ERROR 👇
     fun setEscala(nuevaEscala: String) {
         this.escalaActual = nuevaEscala
         // Al cambiar la escala, refrescamos la lista para que los números cambien (ej. de 80 a 4.0)

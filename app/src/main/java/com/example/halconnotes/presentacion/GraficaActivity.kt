@@ -84,6 +84,22 @@ class GraficaActivity : AppCompatActivity() {
                 }
             }
 
+            //Valores de las barras
+            (barChart.data?.getDataSetByIndex(0) as? BarDataSet)?.valueFormatter =
+                object : ValueFormatter() {
+                    override fun getFormattedValue(value: Float): String {
+                        return when (kotlin.math.round(value).toInt()) {
+                            4 -> "A"
+                            3 -> "B"
+                            2 -> "C"
+                            1 -> "D"
+                            0 -> "F"
+                            else -> ""
+                        }
+                    }
+                }
+
+
             entries.add(BarEntry(index.toFloat(), valor))
         }
 

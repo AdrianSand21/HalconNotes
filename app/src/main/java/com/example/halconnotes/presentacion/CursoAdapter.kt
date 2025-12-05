@@ -10,15 +10,12 @@ import com.example.halconnotes.control.EscalaManager
 import com.example.halconnotes.data.Curso
 
 class CursoAdapter(
-    // Ya no recibimos la lista en el constructor, la inicializamos vacía
     private val onCursoClick: (Int) -> Unit,
     private val onCursoLongClick: (Int) -> Unit
 ) : RecyclerView.Adapter<CursoAdapter.CursoViewHolder>() {
 
-    // La lista ahora es una variable interna
     private var listaCursos = emptyList<Curso>()
     
-    // Flag para verificar si el adaptador está inicializado (útil en MainActivity)
     val isInitialized: Boolean = true
 
     class CursoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -37,7 +34,6 @@ class CursoAdapter(
         holder.tvNombre.text = curso.nombre
         
         // 1. Obtener la escala ACTUALIZADA desde las preferencias
-        // Es vital leerla aquí para que cada vez que se redibuje la lista (notifyDataSetChanged), tome el valor nuevo.
         val context = holder.itemView.context
         val currentScale = EscalaManager.getCurrentScale(context)
         
@@ -47,7 +43,6 @@ class CursoAdapter(
         // 3. Mostrar el valor convertido
         holder.tvPromedio.text = promedioVisual
 
-        // Listeners (mantener igual)
         holder.itemView.setOnClickListener { onCursoClick(position) }
         holder.itemView.setOnLongClickListener {
             onCursoLongClick(position)
@@ -62,13 +57,11 @@ class CursoAdapter(
         return listaCursos[posicion]
     }
 
-    // ¡NUEVO! Función para actualizar los datos desde la Base de Datos
     fun actualizarLista(nuevosCursos: List<Curso>) {
         this.listaCursos = nuevosCursos
         notifyDataSetChanged() // Refresca la vista
     }
 
-    // Devuelve todos los cursos actualmente cargados en el adapter
     fun obtenerTodosLosCursos(): List<Curso> {
         return listaCursos
     }

@@ -5,9 +5,6 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-
-
-// 👇 IMPORTANTE: tableName debe ser "curso" para que el DAO lo encuentre
 @Entity(
     tableName = "curso",
     foreignKeys = [ForeignKey(
