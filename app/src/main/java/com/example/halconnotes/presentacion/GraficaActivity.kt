@@ -20,7 +20,7 @@ class GraficaActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_grafica)
 
-        // --- EDGE-TO-EDGE CONFIGURATION ---
+        // EDGE-TO-EDGE
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
 
         val root = findViewById<android.view.View>(R.id.root_layout_grafica)
@@ -38,20 +38,20 @@ class GraficaActivity : AppCompatActivity() {
             insets
         }
 
-        // --- TOOLBAR ---
+        // Toolbar
         toolbar.setNavigationOnClickListener { finish() }
 
-        // --- TÍTULO DE LA GRÁFICA ---
+        // Titulo (grafica)
         val tituloGrafica = findViewById<TextView>(R.id.tvTituloGrafica)
         tituloGrafica.text = "Gráfica de calificaciones"
         tituloGrafica.setTextColor(Color.parseColor("#0D47A1")) // Azul intenso
         tituloGrafica.textSize = 26f // Ajusta tamaño para igualar percepción
         tituloGrafica.elevation = 4f
 
-        // --- BARCHART ---
+        // Barchar
         val barChart = findViewById<BarChart>(R.id.barChart)
 
-        // --- OBTENER ESCALA ACTUAL ---
+        // Obtener escala actual
         val currentScale = EscalaManager.getCurrentScale(this)
         var maxScale = EscalaManager.getNumericScaleMax(currentScale)
         val isAlfabetica = currentScale.contains("A a F")
@@ -61,16 +61,17 @@ class GraficaActivity : AppCompatActivity() {
             maxScale = 4f
         }
 
-        // --- RECIBIR DATOS DESDE MAINACTIVITY ---
+        // Recepción de datos desde mainActivity
         val nombres = intent.getStringArrayListExtra("NOMBRES") ?: arrayListOf()
         val promedios = intent.getFloatArrayExtra("PROMEDIOS") ?: floatArrayOf()
 
-        // --- CREAR ENTRADAS PARA LA GRÁFICA ---
+        // Creación de entradas para grafica
         val entries = ArrayList<BarEntry>()
         nombres.forEachIndexed { index, _ ->
             var valor = promedios.getOrElse(index) { 0f }
 
             // Si la escala es 0-5, convertir el valor (asumiendo que viene en 0-100)
+
             if (maxScale == 5.0f && !isAlfabetica) {
                 valor = (valor / 100f) * 5f
             } else if (isAlfabetica) {
@@ -87,13 +88,13 @@ class GraficaActivity : AppCompatActivity() {
             entries.add(BarEntry(index.toFloat(), valor))
         }
 
-        // --- CONFIGURAR DATASET ---
+        // Configuración de dataset
         val dataSet = BarDataSet(entries, "Promedio por Curso")
         dataSet.color = Color.parseColor("#0D47A1") // mismo azul que el título
         val data = BarData(dataSet)
         data.barWidth = 0.9f
 
-        // --- CONFIGURAR BARCHART ---
+        // configuración de barchart
         barChart.data = data
         barChart.setFitBars(true)
         barChart.xAxis.valueFormatter = IndexAxisValueFormatter(nombres)
@@ -103,6 +104,7 @@ class GraficaActivity : AppCompatActivity() {
         barChart.axisLeft.axisMaximum = maxScale
 
         // Si es alfabética, formatear el eje Y con letras
+
         if (isAlfabetica) {
             barChart.axisLeft.granularity = 1f
             barChart.axisLeft.labelCount = 5
@@ -123,13 +125,32 @@ class GraficaActivity : AppCompatActivity() {
 
             }
         } else {
+
             // Restaurar formateador por defecto si no es alfabética (por si acaso se reusa la vista)
+
             barChart.axisLeft.valueFormatter = null
         }
+
+        //Valores encima de las barras
+
+        (barChart.data?.getDataSetByIndex(0) as? BarDataSet)?.valueFormatter =
+            object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    return when (kotlin.math.round(value).toInt()) {
+                        4 -> "A"
+                        3 -> "B"
+                        2 -> "C"
+                        1 -> "D"
+                        0 -> "F"
+                        else -> ""
+                    }
+                }
+            }
 
         barChart.axisRight.isEnabled = false
         barChart.description.isEnabled = false // opcional: quitar descripción de default
         barChart.animateY(1000)
         barChart.invalidate() // refresca el gráfico
+
     }
 }

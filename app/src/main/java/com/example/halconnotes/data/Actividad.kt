@@ -13,6 +13,7 @@ import androidx.room.PrimaryKey
         onDelete = ForeignKey.CASCADE
     )]
 )
+
 data class Actividad(
     @PrimaryKey(autoGenerate = true)
     val id_actividad: Int = 0,
@@ -20,4 +21,5 @@ data class Actividad(
     val nombre: String,
     val peso: Float,
     val calificacion: Float
+
 )
